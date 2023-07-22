@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package request // import "miniflux.app/http/request"
 
@@ -10,15 +9,7 @@ import (
 	"strings"
 )
 
-func dropIPv6zone(address string) string {
-	i := strings.IndexByte(address, '%')
-	if i != -1 {
-		address = address[:i]
-	}
-	return address
-}
-
-// FindClientIP returns client real IP address.
+// FindClientIP returns the client real IP address based on trusted Reverse-Proxy HTTP headers.
 func FindClientIP(r *http.Request) string {
 	headers := []string{"X-Forwarded-For", "X-Real-Ip"}
 	for _, header := range headers {
@@ -36,6 +27,11 @@ func FindClientIP(r *http.Request) string {
 	}
 
 	// Fallback to TCP/IP source IP address.
+	return FindRemoteIP(r)
+}
+
+// FindRemoteIP returns remote client IP address.
+func FindRemoteIP(r *http.Request) string {
 	remoteIP, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		remoteIP = r.RemoteAddr
@@ -48,4 +44,12 @@ func FindClientIP(r *http.Request) string {
 	}
 
 	return remoteIP
+}
+
+func dropIPv6zone(address string) string {
+	i := strings.IndexByte(address, '%')
+	if i != -1 {
+		address = address[:i]
+	}
+	return address
 }

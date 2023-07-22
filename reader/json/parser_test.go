@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package json // import "miniflux.app/reader/json"
 
@@ -15,6 +14,8 @@ func TestParseJsonFeed(t *testing.T) {
 	data := `{
 		"version": "https://jsonfeed.org/version/1",
 		"title": "My Example Feed",
+		"icon": "https://micro.blog/jsonfeed/avatar.jpg",
+		"favicon": "https://micro.blog/jsonfeed/favicon.png",
 		"home_page_url": "https://example.org/",
 		"feed_url": "https://example.org/feed.json",
 		"items": [
@@ -46,6 +47,10 @@ func TestParseJsonFeed(t *testing.T) {
 
 	if feed.SiteURL != "https://example.org/" {
 		t.Errorf("Incorrect site URL, got: %s", feed.SiteURL)
+	}
+
+	if feed.IconURL != "https://micro.blog/jsonfeed/avatar.jpg" {
+		t.Errorf("Incorrect icon URL, got: %s", feed.IconURL)
 	}
 
 	if len(feed.Entries) != 2 {
@@ -573,5 +578,77 @@ func TestParseInvalidJSON(t *testing.T) {
 	_, err := Parse("https://example.org/feed.json", bytes.NewBufferString(data))
 	if err == nil {
 		t.Error("Parse should returns an error")
+	}
+}
+
+func TestParseTags(t *testing.T) {
+	data := `{
+		"version": "https://jsonfeed.org/version/1",
+		"user_comment": "This is a microblog feed. You can add this to your feed reader using the following URL: https://example.org/feed.json",
+		"title": "Brent Simmons’s Microblog",
+		"home_page_url": "https://example.org/",
+		"feed_url": "https://example.org/feed.json",
+		"author": {
+			"name": "Brent Simmons",
+			"url": "http://example.org/",
+			"avatar": "https://example.org/avatar.png"
+		},
+		"items": [
+			{
+				"id": "2347259",
+				"url": "https://example.org/2347259",
+				"content_text": "Cats are neat. \n\nhttps://example.org/cats",
+				"date_published": "2016-02-09T14:22:00-07:00",
+				"tags": [
+					"tag 1",
+					"tag 2"
+				]
+			}
+		]
+	}`
+
+	feed, err := Parse("https://example.org/feed.json", bytes.NewBufferString(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(feed.Entries[0].Tags) != 2 {
+		t.Errorf("Incorrect number of Tags, got: %d", len(feed.Entries[0].Tags))
+	}
+
+	expected := "tag 2"
+	result := feed.Entries[0].Tags[1]
+	if result != expected {
+		t.Errorf("Incorrect entry tag, got %q instead of %q", result, expected)
+	}
+}
+
+func TestParseFavicon(t *testing.T) {
+	data := `{
+		"version": "https://jsonfeed.org/version/1",
+		"title": "My Example Feed",
+		"favicon": "https://micro.blog/jsonfeed/favicon.png",
+		"home_page_url": "https://example.org/",
+		"feed_url": "https://example.org/feed.json",
+		"items": [
+			{
+				"id": "2",
+				"content_text": "This is a second item.",
+				"url": "https://example.org/second-item"
+			},
+			{
+				"id": "1",
+				"content_html": "<p>Hello, world!</p>",
+				"url": "https://example.org/initial-post"
+			}
+		]
+	}`
+
+	feed, err := Parse("https://example.org/feed.json", bytes.NewBufferString(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if feed.IconURL != "https://micro.blog/jsonfeed/favicon.png" {
+		t.Errorf("Incorrect icon URL, got: %s", feed.IconURL)
 	}
 }

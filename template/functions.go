@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package template // import "miniflux.app/template"
 
@@ -61,16 +60,24 @@ func (f *funcMap) Map() template.FuncMap {
 			return template.HTML(str)
 		},
 		"proxyFilter": func(data string) string {
-			return proxy.ImageProxyRewriter(f.router, data)
+			return proxy.ProxyRewriter(f.router, data)
 		},
 		"proxyURL": func(link string) string {
-			proxyImages := config.Opts.ProxyImages()
+			proxyOption := config.Opts.ProxyOption()
 
-			if proxyImages == "all" || (proxyImages != "none" && !url.IsHTTPS(link)) {
+			if proxyOption == "all" || (proxyOption != "none" && !url.IsHTTPS(link)) {
 				return proxy.ProxifyURL(f.router, link)
 			}
 
 			return link
+		},
+		"mustBeProxyfied": func(mediaType string) bool {
+			for _, t := range config.Opts.ProxyMediaTypes() {
+				if t == mediaType {
+					return true
+				}
+			}
+			return false
 		},
 		"domain": func(websiteURL string) string {
 			return url.Domain(websiteURL)
@@ -100,6 +107,7 @@ func (f *funcMap) Map() template.FuncMap {
 		"nonce": func() string {
 			return crypto.GenerateRandomStringHex(16)
 		},
+		"deRef": func(i *int) int { return *i },
 
 		// These functions are overrode at runtime after the parsing.
 		"elapsed": func(timezone string, t time.Time) string {

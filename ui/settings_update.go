@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package ui // import "miniflux.app/ui"
 
@@ -61,6 +60,7 @@ func (h *handler) updateSettings(w http.ResponseWriter, r *http.Request) {
 		EntryDirection:      model.OptionalString(settingsForm.EntryDirection),
 		EntriesPerPage:      model.OptionalInt(settingsForm.EntriesPerPage),
 		DisplayMode:         model.OptionalString(settingsForm.DisplayMode),
+		GestureNav:          model.OptionalString(settingsForm.GestureNav),
 		DefaultReadingSpeed: model.OptionalInt(settingsForm.DefaultReadingSpeed),
 		CJKReadingSpeed:     model.OptionalInt(settingsForm.CJKReadingSpeed),
 		DefaultHomePage:     model.OptionalString(settingsForm.DefaultHomePage),

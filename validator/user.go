@@ -1,6 +1,5 @@
-// Copyright 2021 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package validator // import "miniflux.app/validator"
 
@@ -75,6 +74,12 @@ func ValidateUserModification(store *storage.Storage, userID int64, changes *mod
 
 	if changes.DisplayMode != nil {
 		if err := validateDisplayMode(*changes.DisplayMode); err != nil {
+			return err
+		}
+	}
+
+	if changes.GestureNav != nil {
+		if err := validateGestureNav(*changes.GestureNav); err != nil {
 			return err
 		}
 	}
@@ -159,6 +164,13 @@ func validateEntriesPerPage(entriesPerPage int) *ValidationError {
 func validateDisplayMode(displayMode string) *ValidationError {
 	if displayMode != "fullscreen" && displayMode != "standalone" && displayMode != "minimal-ui" && displayMode != "browser" {
 		return NewValidationError("error.invalid_display_mode")
+	}
+	return nil
+}
+
+func validateGestureNav(gestureNav string) *ValidationError {
+	if gestureNav != "none" && gestureNav != "tap" && gestureNav != "swipe" {
+		return NewValidationError("error.invalid_gesture_nav")
 	}
 	return nil
 }

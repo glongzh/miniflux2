@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package html // import "miniflux.app/http/response/html"
 
@@ -26,6 +25,7 @@ func ServerError(w http.ResponseWriter, r *http.Request, err error) {
 
 	builder := response.New(w, r)
 	builder.WithStatus(http.StatusInternalServerError)
+	builder.WithHeader("Content-Security-Policy", `default-src 'self'`)
 	builder.WithHeader("Content-Type", "text/html; charset=utf-8")
 	builder.WithHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
 	builder.WithBody(err)
@@ -38,6 +38,7 @@ func BadRequest(w http.ResponseWriter, r *http.Request, err error) {
 
 	builder := response.New(w, r)
 	builder.WithStatus(http.StatusBadRequest)
+	builder.WithHeader("Content-Security-Policy", `default-src 'self'`)
 	builder.WithHeader("Content-Type", "text/html; charset=utf-8")
 	builder.WithHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
 	builder.WithBody(err)
@@ -71,4 +72,17 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 // Redirect redirects the user to another location.
 func Redirect(w http.ResponseWriter, r *http.Request, uri string) {
 	http.Redirect(w, r, uri, http.StatusFound)
+}
+
+// RequestedRangeNotSatisfiable sends a range not satisfiable error to the client.
+func RequestedRangeNotSatisfiable(w http.ResponseWriter, r *http.Request, contentRange string) {
+	logger.Error("[HTTP:Range Not Satisfiable] %s", r.URL)
+
+	builder := response.New(w, r)
+	builder.WithStatus(http.StatusRequestedRangeNotSatisfiable)
+	builder.WithHeader("Content-Type", "text/html; charset=utf-8")
+	builder.WithHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
+	builder.WithHeader("Content-Range", contentRange)
+	builder.WithBody("Range Not Satisfiable")
+	builder.Write()
 }

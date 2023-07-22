@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package response // import "miniflux.app/http/response"
 
@@ -12,6 +11,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"miniflux.app/logger"
 )
 
 const compressionThreshold = 1024
@@ -88,7 +89,10 @@ func (b *Builder) Write() {
 	case io.Reader:
 		// Compression not implemented in this case
 		b.writeHeaders()
-		io.Copy(b.w, v)
+		_, err := io.Copy(b.w, v)
+		if err != nil {
+			logger.Error("%v", err)
+		}
 	}
 }
 

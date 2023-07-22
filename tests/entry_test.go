@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 //go:build integration
 // +build integration
@@ -43,7 +42,7 @@ func TestGetAllFeedEntries(t *testing.T) {
 		t.Fatal(`Filtered entries should be different than previous results`)
 	}
 
-	filteredResultsByEntryID, err := client.FeedEntries(feed.ID, &miniflux.Filter{BeforeEntryID: allResults.Entries[0].ID})
+	filteredResultsByEntryID, err := client.FeedEntries(feed.ID, &miniflux.Filter{AfterEntryID: allResults.Entries[0].ID})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +82,7 @@ func TestGetAllCategoryEntries(t *testing.T) {
 		t.Fatal(`Filtered entries should be different than previous results`)
 	}
 
-	filteredResultsByEntryID, err := client.CategoryEntries(category.ID, &miniflux.Filter{BeforeEntryID: allResults.Entries[0].ID})
+	filteredResultsByEntryID, err := client.CategoryEntries(category.ID, &miniflux.Filter{AfterEntryID: allResults.Entries[0].ID})
 	if err != nil {
 		t.Fatal(err)
 	}

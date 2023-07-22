@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package json // import "miniflux.app/reader/json"
 
@@ -17,13 +16,15 @@ import (
 )
 
 type jsonFeed struct {
-	Version string       `json:"version"`
-	Title   string       `json:"title"`
-	SiteURL string       `json:"home_page_url"`
-	FeedURL string       `json:"feed_url"`
-	Authors []jsonAuthor `json:"authors"`
-	Author  jsonAuthor   `json:"author"`
-	Items   []jsonItem   `json:"items"`
+	Version    string       `json:"version"`
+	Title      string       `json:"title"`
+	SiteURL    string       `json:"home_page_url"`
+	IconURL    string       `json:"icon"`
+	FaviconURL string       `json:"favicon"`
+	FeedURL    string       `json:"feed_url"`
+	Authors    []jsonAuthor `json:"authors"`
+	Author     jsonAuthor   `json:"author"`
+	Items      []jsonItem   `json:"items"`
 }
 
 type jsonAuthor struct {
@@ -43,6 +44,7 @@ type jsonItem struct {
 	Authors       []jsonAuthor     `json:"authors"`
 	Author        jsonAuthor       `json:"author"`
 	Attachments   []jsonAttachment `json:"attachments"`
+	Tags          []string         `json:"tags"`
 }
 
 type jsonAttachment struct {
@@ -73,6 +75,12 @@ func (j *jsonFeed) Transform(baseURL string) *model.Feed {
 	feed.SiteURL, err = url.AbsoluteURL(baseURL, j.SiteURL)
 	if err != nil {
 		feed.SiteURL = j.SiteURL
+	}
+
+	feed.IconURL = strings.TrimSpace(j.IconURL)
+
+	if feed.IconURL == "" {
+		feed.IconURL = strings.TrimSpace(j.FaviconURL)
 	}
 
 	feed.Title = strings.TrimSpace(j.Title)
@@ -181,6 +189,7 @@ func (j *jsonItem) Transform() *model.Entry {
 	entry.Content = j.GetContent()
 	entry.Title = strings.TrimSpace(j.GetTitle())
 	entry.Enclosures = j.GetEnclosures()
+	entry.Tags = j.Tags
 	return entry
 }
 

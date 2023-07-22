@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package ui // import "miniflux.app/ui"
 
@@ -9,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"miniflux.app/crypto"
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/html"
 	"miniflux.app/http/route"
@@ -57,11 +57,16 @@ func (h *handler) updateIntegration(w http.ResponseWriter, r *http.Request) {
 
 	if integration.GoogleReaderEnabled {
 		if integrationForm.GoogleReaderPassword != "" {
-			integration.GoogleReaderPassword = integrationForm.GoogleReaderPassword
+			integration.GoogleReaderPassword, err = crypto.HashPassword(integrationForm.GoogleReaderPassword)
+			if err != nil {
+				html.ServerError(w, r, err)
+				return
+			}
 		}
 	} else {
 		integration.GoogleReaderPassword = ""
 	}
+
 	err = h.store.UpdateIntegration(integration)
 	if err != nil {
 		html.ServerError(w, r, err)

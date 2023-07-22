@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package sanitizer // import "miniflux.app/reader/sanitizer"
 
@@ -414,7 +413,7 @@ func getTagAllowList() map[string][]string {
 	whitelist["wbr"] = []string{}
 	whitelist["dfn"] = []string{}
 	whitelist["sub"] = []string{}
-	whitelist["sup"] = []string{}
+	whitelist["sup"] = []string{"id"}
 	whitelist["var"] = []string{}
 	whitelist["samp"] = []string{}
 	whitelist["s"] = []string{}
@@ -442,7 +441,7 @@ func inList(needle string, haystack []string) bool {
 func rewriteIframeURL(link string) string {
 	matches := youtubeEmbedRegex.FindStringSubmatch(link)
 	if len(matches) == 2 {
-		return `https://www.youtube-nocookie.com/embed/` + matches[1]
+		return config.Opts.YouTubeEmbedUrlOverride() + matches[1]
 	}
 
 	return link

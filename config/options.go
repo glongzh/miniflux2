@@ -1,6 +1,5 @@
-// Copyright 2019 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package config // import "miniflux.app/config"
 
@@ -46,9 +45,12 @@ const (
 	defaultCleanupArchiveUnreadDays           = 180
 	defaultCleanupArchiveBatchSize            = 10000
 	defaultCleanupRemoveSessionsDays          = 30
-	defaultProxyImages                        = "http-only"
-	defaultProxyImageUrl                      = ""
+	defaultProxyHTTPClientTimeout             = 120
+	defaultProxyOption                        = "http-only"
+	defaultProxyMediaTypes                    = "image"
+	defaultProxyUrl                           = ""
 	defaultFetchYouTubeWatchTime              = false
+	defaultYouTubeEmbedUrlOverride            = "https://www.youtube-nocookie.com/embed/"
 	defaultCreateAdmin                        = false
 	defaultAdminUsername                      = ""
 	defaultAdminPassword                      = ""
@@ -62,6 +64,7 @@ const (
 	defaultHTTPClientTimeout                  = 20
 	defaultHTTPClientMaxBodySize              = 15
 	defaultHTTPClientProxy                    = ""
+	defaultHTTPServerTimeout                  = 300
 	defaultAuthProxyHeader                    = ""
 	defaultAuthProxyUserCreation              = false
 	defaultMaintenanceMode                    = false
@@ -69,6 +72,8 @@ const (
 	defaultMetricsCollector                   = false
 	defaultMetricsRefreshInterval             = 60
 	defaultMetricsAllowedNetworks             = "127.0.0.1/8"
+	defaultMetricsUsername                    = ""
+	defaultMetricsPassword                    = ""
 	defaultWatchdog                           = true
 	defaultInvidiousInstance                  = "yewtu.be"
 )
@@ -117,9 +122,12 @@ type Options struct {
 	createAdmin                        bool
 	adminUsername                      string
 	adminPassword                      string
-	proxyImages                        string
-	proxyImageUrl                      string
+	proxyHTTPClientTimeout             int
+	proxyOption                        string
+	proxyMediaTypes                    []string
+	proxyUrl                           string
 	fetchYouTubeWatchTime              bool
+	youTubeEmbedUrlOverride            string
 	oauth2UserCreationAllowed          bool
 	oauth2ClientID                     string
 	oauth2ClientSecret                 string
@@ -131,6 +139,7 @@ type Options struct {
 	httpClientMaxBodySize              int64
 	httpClientProxy                    string
 	httpClientUserAgent                string
+	httpServerTimeout                  int
 	authProxyHeader                    string
 	authProxyUserCreation              bool
 	maintenanceMode                    bool
@@ -138,6 +147,8 @@ type Options struct {
 	metricsCollector                   bool
 	metricsRefreshInterval             int
 	metricsAllowedNetworks             []string
+	metricsUsername                    string
+	metricsPassword                    string
 	watchdog                           bool
 	invidiousInstance                  string
 	proxyPrivateKey                    []byte
@@ -181,9 +192,12 @@ func NewOptions() *Options {
 		pollingParsingErrorLimit:           defaultPollingParsingErrorLimit,
 		workerPoolSize:                     defaultWorkerPoolSize,
 		createAdmin:                        defaultCreateAdmin,
-		proxyImages:                        defaultProxyImages,
-		proxyImageUrl:                      defaultProxyImageUrl,
+		proxyHTTPClientTimeout:             defaultProxyHTTPClientTimeout,
+		proxyOption:                        defaultProxyOption,
+		proxyMediaTypes:                    []string{defaultProxyMediaTypes},
+		proxyUrl:                           defaultProxyUrl,
 		fetchYouTubeWatchTime:              defaultFetchYouTubeWatchTime,
+		youTubeEmbedUrlOverride:            defaultYouTubeEmbedUrlOverride,
 		oauth2UserCreationAllowed:          defaultOAuth2UserCreation,
 		oauth2ClientID:                     defaultOAuth2ClientID,
 		oauth2ClientSecret:                 defaultOAuth2ClientSecret,
@@ -195,6 +209,7 @@ func NewOptions() *Options {
 		httpClientMaxBodySize:              defaultHTTPClientMaxBodySize * 1024 * 1024,
 		httpClientProxy:                    defaultHTTPClientProxy,
 		httpClientUserAgent:                defaultHTTPClientUserAgent,
+		httpServerTimeout:                  defaultHTTPServerTimeout,
 		authProxyHeader:                    defaultAuthProxyHeader,
 		authProxyUserCreation:              defaultAuthProxyUserCreation,
 		maintenanceMode:                    defaultMaintenanceMode,
@@ -202,6 +217,8 @@ func NewOptions() *Options {
 		metricsCollector:                   defaultMetricsCollector,
 		metricsRefreshInterval:             defaultMetricsRefreshInterval,
 		metricsAllowedNetworks:             []string{defaultMetricsAllowedNetworks},
+		metricsUsername:                    defaultMetricsUsername,
+		metricsPassword:                    defaultMetricsPassword,
 		watchdog:                           defaultWatchdog,
 		invidiousInstance:                  defaultInvidiousInstance,
 		proxyPrivateKey:                    randomKey,
@@ -414,14 +431,29 @@ func (o *Options) FetchYouTubeWatchTime() bool {
 	return o.fetchYouTubeWatchTime
 }
 
-// ProxyImages returns "none" to never proxy, "http-only" to proxy non-HTTPS, "all" to always proxy.
-func (o *Options) ProxyImages() string {
-	return o.proxyImages
+// YouTubeEmbedUrlOverride returns YouTube URL which will be used for embeds
+func (o *Options) YouTubeEmbedUrlOverride() string {
+	return o.youTubeEmbedUrlOverride
 }
 
-// ProxyImageUrl returns a string of a URL to use to proxy image requests
-func (o *Options) ProxyImageUrl() string {
-	return o.proxyImageUrl
+// ProxyOption returns "none" to never proxy, "http-only" to proxy non-HTTPS, "all" to always proxy.
+func (o *Options) ProxyOption() string {
+	return o.proxyOption
+}
+
+// ProxyMediaTypes returns a slice of media types to proxy.
+func (o *Options) ProxyMediaTypes() []string {
+	return o.proxyMediaTypes
+}
+
+// ProxyUrl returns a string of a URL to use to proxy image requests
+func (o *Options) ProxyUrl() string {
+	return o.proxyUrl
+}
+
+// ProxyHTTPClientTimeout returns the time limit in seconds before the proxy HTTP client cancel the request.
+func (o *Options) ProxyHTTPClientTimeout() int {
+	return o.proxyHTTPClientTimeout
 }
 
 // HasHTTPService returns true if the HTTP service is enabled.
@@ -457,6 +489,11 @@ func (o *Options) HTTPClientProxy() string {
 	return o.httpClientProxy
 }
 
+// HTTPServerTimeout returns the time limit in seconds before the HTTP server cancel the request.
+func (o *Options) HTTPServerTimeout() int {
+	return o.httpServerTimeout
+}
+
 // HasHTTPClientProxyConfigured returns true if the HTTP proxy is configured.
 func (o *Options) HasHTTPClientProxyConfigured() bool {
 	return o.httpClientProxy != ""
@@ -487,6 +524,14 @@ func (o *Options) MetricsRefreshInterval() int {
 // MetricsAllowedNetworks returns the list of networks allowed to connect to the metrics endpoint.
 func (o *Options) MetricsAllowedNetworks() []string {
 	return o.metricsAllowedNetworks
+}
+
+func (o *Options) MetricsUsername() string {
+	return o.metricsUsername
+}
+
+func (o *Options) MetricsPassword() string {
+	return o.metricsPassword
 }
 
 // HTTPClientUserAgent returns the global User-Agent header for miniflux.
@@ -521,36 +566,39 @@ func (o *Options) SortedOptions(redactSecret bool) []*Option {
 		"BATCH_SIZE":                             o.batchSize,
 		"CERT_DOMAIN":                            o.certDomain,
 		"CERT_FILE":                              o.certFile,
+		"CLEANUP_ARCHIVE_BATCH_SIZE":             o.cleanupArchiveBatchSize,
 		"CLEANUP_ARCHIVE_READ_DAYS":              o.cleanupArchiveReadDays,
 		"CLEANUP_ARCHIVE_UNREAD_DAYS":            o.cleanupArchiveUnreadDays,
-		"CLEANUP_ARCHIVE_BATCH_SIZE":             o.cleanupArchiveBatchSize,
 		"CLEANUP_FREQUENCY_HOURS":                o.cleanupFrequencyHours,
 		"CLEANUP_REMOVE_SESSIONS_DAYS":           o.cleanupRemoveSessionsDays,
 		"CREATE_ADMIN":                           o.createAdmin,
+		"DATABASE_CONNECTION_LIFETIME":           o.databaseConnectionLifetime,
 		"DATABASE_MAX_CONNS":                     o.databaseMaxConns,
 		"DATABASE_MIN_CONNS":                     o.databaseMinConns,
-		"DATABASE_CONNECTION_LIFETIME":           o.databaseConnectionLifetime,
 		"DATABASE_URL":                           redactSecretValue(o.databaseURL, redactSecret),
 		"DEBUG":                                  o.debug,
 		"DISABLE_HSTS":                           !o.hsts,
-		"DISABLE_SCHEDULER_SERVICE":              !o.schedulerService,
 		"DISABLE_HTTP_SERVICE":                   !o.httpService,
+		"DISABLE_SCHEDULER_SERVICE":              !o.schedulerService,
 		"FETCH_YOUTUBE_WATCH_TIME":               o.fetchYouTubeWatchTime,
 		"HTTPS":                                  o.HTTPS,
 		"HTTP_CLIENT_MAX_BODY_SIZE":              o.httpClientMaxBodySize,
 		"HTTP_CLIENT_PROXY":                      o.httpClientProxy,
 		"HTTP_CLIENT_TIMEOUT":                    o.httpClientTimeout,
 		"HTTP_CLIENT_USER_AGENT":                 o.httpClientUserAgent,
+		"HTTP_SERVER_TIMEOUT":                    o.httpServerTimeout,
 		"HTTP_SERVICE":                           o.httpService,
-		"KEY_FILE":                               o.certKeyFile,
 		"INVIDIOUS_INSTANCE":                     o.invidiousInstance,
+		"KEY_FILE":                               o.certKeyFile,
 		"LISTEN_ADDR":                            o.listenAddr,
 		"LOG_DATE_TIME":                          o.logDateTime,
 		"MAINTENANCE_MESSAGE":                    o.maintenanceMessage,
 		"MAINTENANCE_MODE":                       o.maintenanceMode,
 		"METRICS_ALLOWED_NETWORKS":               strings.Join(o.metricsAllowedNetworks, ","),
 		"METRICS_COLLECTOR":                      o.metricsCollector,
+		"METRICS_PASSWORD":                       redactSecretValue(o.metricsPassword, redactSecret),
 		"METRICS_REFRESH_INTERVAL":               o.metricsRefreshInterval,
+		"METRICS_USERNAME":                       o.metricsUsername,
 		"OAUTH2_CLIENT_ID":                       o.oauth2ClientID,
 		"OAUTH2_CLIENT_SECRET":                   redactSecretValue(o.oauth2ClientSecret, redactSecret),
 		"OAUTH2_OIDC_DISCOVERY_ENDPOINT":         o.oauth2OidcDiscoveryEndpoint,
@@ -561,17 +609,20 @@ func (o *Options) SortedOptions(redactSecret bool) []*Option {
 		"POLLING_FREQUENCY":                      o.pollingFrequency,
 		"POLLING_PARSING_ERROR_LIMIT":            o.pollingParsingErrorLimit,
 		"POLLING_SCHEDULER":                      o.pollingScheduler,
-		"PROXY_IMAGES":                           o.proxyImages,
-		"PROXY_IMAGE_URL":                        o.proxyImageUrl,
+		"PROXY_HTTP_CLIENT_TIMEOUT":              o.proxyHTTPClientTimeout,
+		"PROXY_MEDIA_TYPES":                      o.proxyMediaTypes,
+		"PROXY_OPTION":                           o.proxyOption,
 		"PROXY_PRIVATE_KEY":                      redactSecretValue(string(o.proxyPrivateKey), redactSecret),
+		"PROXY_URL":                              o.proxyUrl,
 		"ROOT_URL":                               o.rootURL,
 		"RUN_MIGRATIONS":                         o.runMigrations,
 		"SCHEDULER_ENTRY_FREQUENCY_MAX_INTERVAL": o.schedulerEntryFrequencyMaxInterval,
 		"SCHEDULER_ENTRY_FREQUENCY_MIN_INTERVAL": o.schedulerEntryFrequencyMinInterval,
 		"SCHEDULER_SERVICE":                      o.schedulerService,
 		"SERVER_TIMING_HEADER":                   o.serverTimingHeader,
-		"WORKER_POOL_SIZE":                       o.workerPoolSize,
 		"WATCHDOG":                               o.watchdog,
+		"WORKER_POOL_SIZE":                       o.workerPoolSize,
+		"YOUTUBE_EMBED_URL_OVERRIDE":             o.youTubeEmbedUrlOverride,
 	}
 
 	keys := make([]string, 0, len(keyValues))
@@ -599,7 +650,7 @@ func (o *Options) String() string {
 
 func redactSecretValue(value string, redactSecret bool) string {
 	if redactSecret && value != "" {
-		return "******"
+		return "<secret>"
 	}
 	return value
 }

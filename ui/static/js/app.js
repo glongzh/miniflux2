@@ -94,7 +94,7 @@ function setFocusToSearchInput(event) {
 function showKeyboardShortcuts() {
     let template = document.getElementById("keyboard-shortcuts");
     if (template !== null) {
-        ModalHandler.open(template.content);
+        ModalHandler.open(template.content, "dialog-title");
     }
 }
 
@@ -617,4 +617,24 @@ function showToast(label, iconElement) {
 /** Navigate to the new subscription page. */
 function goToAddSubscription() {
     window.location.href = document.body.dataset.addSubscriptionUrl;
+}
+
+/**
+ * save player position to allow to resume playback later
+ * @param {Element} playerElement
+ */
+function handlePlayerProgressionSave(playerElement) {
+    const currentPositionInSeconds = Math.floor(playerElement.currentTime); // we do not need a precise value
+    const lastKnownPositionInSeconds = parseInt(playerElement.dataset.lastPosition, 10);
+    const recordInterval = 10;
+
+    // we limit the number of update to only one by interval. Otherwise, we would have multiple update per seconds
+    if (currentPositionInSeconds >= (lastKnownPositionInSeconds + recordInterval) ||
+        currentPositionInSeconds <= (lastKnownPositionInSeconds - recordInterval)
+    ) {
+        playerElement.dataset.lastPosition = currentPositionInSeconds.toString();
+        let request = new RequestBuilder(playerElement.dataset.saveUrl);
+        request.withBody({progression: currentPositionInSeconds});
+        request.execute();
+    }
 }

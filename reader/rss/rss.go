@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package rss // import "miniflux.app/reader/rss"
 
@@ -27,6 +26,7 @@ type rssFeed struct {
 	Version        string    `xml:"version,attr"`
 	Title          string    `xml:"channel>title"`
 	Links          []rssLink `xml:"channel>link"`
+	ImageURL       string    `xml:"channel>image>url"`
 	Language       string    `xml:"channel>language"`
 	Description    string    `xml:"channel>description"`
 	PubDate        string    `xml:"channel>pubDate"`
@@ -57,6 +57,8 @@ func (r *rssFeed) Transform(baseURL string) *model.Feed {
 	if feed.Title == "" {
 		feed.Title = feed.SiteURL
 	}
+
+	feed.IconURL = strings.TrimSpace(r.ImageURL)
 
 	for _, item := range r.Items {
 		entry := item.Transform()
@@ -156,6 +158,12 @@ type rssEnclosure struct {
 	Length string `xml:"length,attr"`
 }
 
+type rssCategory struct {
+	XMLName xml.Name
+	Data    string `xml:",chardata"`
+	Inner   string `xml:",innerxml"`
+}
+
 func (enclosure *rssEnclosure) Size() int64 {
 	if enclosure.Length == "" {
 		return 0
@@ -173,6 +181,7 @@ type rssItem struct {
 	Authors        []rssAuthor      `xml:"author"`
 	CommentLinks   []rssCommentLink `xml:"comments"`
 	EnclosureLinks []rssEnclosure   `xml:"enclosure"`
+	Categories     []rssCategory    `xml:"category"`
 	DublinCoreElement
 	FeedBurnerElement
 	PodcastEntryElement
@@ -189,6 +198,8 @@ func (r *rssItem) Transform() *model.Entry {
 	entry.Content = r.entryContent()
 	entry.Title = r.entryTitle()
 	entry.Enclosures = r.entryEnclosures()
+	entry.Tags = r.entryCategories()
+
 	return entry
 }
 
@@ -370,6 +381,20 @@ func (r *rssItem) entryEnclosures() model.EnclosureList {
 	}
 
 	return enclosures
+}
+
+func (r *rssItem) entryCategories() []string {
+	var categoryList []string
+
+	for _, rssCategory := range r.Categories {
+		if strings.Contains(rssCategory.Inner, "<![CDATA[") {
+			categoryList = append(categoryList, strings.TrimSpace(rssCategory.Data))
+		} else {
+			categoryList = append(categoryList, strings.TrimSpace(rssCategory.Inner))
+		}
+	}
+
+	return categoryList
 }
 
 func (r *rssItem) entryCommentsURL() string {

@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package url // import "miniflux.app/url"
 
@@ -25,6 +24,8 @@ func TestAbsoluteURL(t *testing.T) {
 	scenarios := [][]string{
 		{"https://example.org/path/file.ext", "https://example.org/folder/", "/path/file.ext"},
 		{"https://example.org/folder/path/file.ext", "https://example.org/folder/", "path/file.ext"},
+		{"https://example.org/", "https://example.org/path", "./"},
+		{"https://example.org/folder/", "https://example.org/folder/", "./"},
 		{"https://example.org/path/file.ext", "https://example.org/folder", "path/file.ext"},
 		{"https://example.org/path/file.ext", "https://example.org/folder/", "https://example.org/path/file.ext"},
 		{"https://static.example.org/path/file.ext", "https://www.example.org/", "//static.example.org/path/file.ext"},

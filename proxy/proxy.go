@@ -1,6 +1,5 @@
-// Copyright 2020 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package proxy // import "miniflux.app/proxy"
 
@@ -21,7 +20,7 @@ import (
 // ProxifyURL generates a relative URL for a proxified resource.
 func ProxifyURL(router *mux.Router, link string) string {
 	if link != "" {
-		proxyImageUrl := config.Opts.ProxyImageUrl()
+		proxyImageUrl := config.Opts.ProxyUrl()
 
 		if proxyImageUrl == "" {
 			mac := hmac.New(sha256.New, config.Opts.ProxyPrivateKey())
@@ -44,7 +43,7 @@ func ProxifyURL(router *mux.Router, link string) string {
 // AbsoluteProxifyURL generates an absolute URL for a proxified resource.
 func AbsoluteProxifyURL(router *mux.Router, host, link string) string {
 	if link != "" {
-		proxyImageUrl := config.Opts.ProxyImageUrl()
+		proxyImageUrl := config.Opts.ProxyUrl()
 
 		if proxyImageUrl == "" {
 			mac := hmac.New(sha256.New, config.Opts.ProxyPrivateKey())

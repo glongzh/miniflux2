@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 //go:build integration
 // +build integration
@@ -86,6 +85,10 @@ func TestGetUsers(t *testing.T) {
 
 	if users[0].DisplayMode != "standalone" {
 		t.Fatalf(`Invalid web app display mode, got "%v"`, users[0].DisplayMode)
+	}
+
+	if users[0].GestureNav != "tap" {
+		t.Fatalf(`Invalid gesture navigation, got "%v"`, users[0].GestureNav)
 	}
 
 	if users[0].DefaultReadingSpeed != 265 {

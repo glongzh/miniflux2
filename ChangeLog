@@ -1,3 +1,132 @@
+Version 2.0.46 (July 21, 2023)
+------------------------------
+
+* Add scraper and rewrite rules for Webtoons
+* Fix regression in integration page and simplify SQL query
+* Wallabag integration: add more information in log messages
+* Add support for custom Youtube embed URL
+* Fix accessibility issues in modal component
+    * Fix modal aria role
+    * Trap focusing with tab / shift+tab inside the modal
+    * Restore keyboard focus when closing modal
+    * Automatically move keyboard focus to first focusable element unless specified otherwise
+    * Keyboard shortcut help modal: move keyboard focus to modal title
+    * Keyboard shortcut help modal: change close control from link to button
+* Add Notion integration
+* Update `golang.org/x/*` dependencies and `go-oidc` to v3.6.0
+* Improve responsive design
+* Add user setting for marking entry as read on view
+* Improve Russian translation
+* Add the possibility to run cleanup tasks from the command line
+* Add the possibility to run Miniflux as a cronjob
+* Use `go-httpbin` to run tests locally and avoid remote calls to `httpbin.org`
+* Display tags when viewing entries
+* Update categories API endpoint to return `total_unread` and `feed_count`
+* Improve date parser to handle various broken date formats
+* Avoid `pq: time zone displacement out of range` errors
+* Improve entry existance check to make better use of index
+* Add unique index `enclosures_user_entry_url_idx`
+* Add mark as unread for Linkding integration
+* Add sub-folder support for Wallabag integration
+* Use RockyLinux to build RPM package
+* Disable CGO when building RPM package
+* Disable CGO when building Docker images
+
+Version 2.0.45 (June 21, 2023)
+------------------------------
+
+* Add media player to listen to audio and video podcasts with the possiblity to resume to last playback position
+* Add default tag names for Linkding integration
+* Mark only globally visible entries when marking all entries from UI
+* Use image included in feed as feed icon when available
+* Order history by `changed_at` and `published_at`
+* Remove title attribute from entry title links
+* Fix reading time that is not aligned correctly with the latest version of Safari
+* Use glyphs of the same size on keyboard shortcuts page
+* Add maskable versions of the PWA icon
+* Replace copyright header with SPDX identifier
+* Remove the "í" letter from the Portuguese "lido" word
+* Increase golangci-lint timeout value
+* Bump `github.com/tdewolff/minify/v2`, `github.com/prometheus/client_golang`, `golang.org/x/*` dependencies
+
+Version 2.0.44 (May 6, 2023)
+----------------------------
+
+* Add link to the URL rewrite rules documentation
+* Update scraping rules for `ilpost.it`
+* Update rewrite rules for `theverge.com`
+* Add a rewrite rule to remove clickbait titles
+* Make sure `PROXY_IMAGES` option is backward compatible with `PROXY_OPTION` and `PROXY_MEDIA_TYPES`
+* Add new rule to remove tables
+* Add support for searching well-known URLs in subdirectory
+* Add CSS `word-wrap` rule to break very long entry title into multiple lines
+* Add swipe as option for gesture navigation between entries. There are now 3 possible choices: `none`, `double-tap`, and `swipe`.
+* Prefer typographic punctuation in English translation
+* Process older entries first:
+    - Feed entries are usually ordered from most to least recent.
+    - Processing older entries first ensures that their creation timestamp
+    is lower than that of newer entries.
+    - This is useful when we order by creation, because then we get a
+    consistent timeline.
+* Fix Grafana dashboard
+* Push Docker images to `Quay.io` (RedHat)
+* Bump `golang.org/x/*`, `github.com/lib/pq`, `mvdan.cc/xurls/v2` and `github.com/prometheus/client_golang` dependencies
+
+Version 2.0.43 (March 16, 2023)
+-------------------------------
+
+* Avoid XSS when opening a broken image due to unescaped ServerError in proxy handler (CVE-2023-27592)
+
+    Creating an RSS feed item with the inline description containing an `<img>` tag
+    with a `srcset` attribute pointing to an invalid URL like
+    `http:a<script>alert(1)</script>`, we can coerce the proxy handler into an error
+    condition where the invalid URL is returned unescaped and in full.
+
+    This results in JavaScript execution on the Miniflux instance as soon as the
+    user is convinced to open the broken image.
+
+* Use `r.RemoteAddr` to check `/metrics` endpoint network access (CVE-2023-27591)
+
+    HTTP headers like `X-Forwarded-For` or `X-Real-Ip` can be easily spoofed. As
+    such, it cannot be used to test if the client IP is allowed.
+
+    The recommendation is to use HTTP Basic authentication to protect the
+    metrics endpoint, or run Miniflux behind a trusted reverse-proxy.
+
+* Add HTTP Basic authentication for `/metrics` endpoint
+* Add proxy support for several media types
+* Parse feed categories from RSS, Atom and JSON feeds
+* Ignore empty link when discovering feeds
+* Disable CGO explicitly to make sure the binary is statically linked
+* Add CSS classes to differentiate between category/feed/entry view and icons
+* Add rewrite and scraper rules for `blog.cloudflare.com`
+* Add `color-scheme` to themes
+* Add new keyboard shortcut to toggle open/close entry attachments section
+* Sanitizer: allow `id` attribute in `<sup>` element
+* Add Indonesian Language
+* Update translations
+* Update Docker Compose examples:
+    - Run the application in one command
+    - Bring back the health check condition to `depends_on`
+    - Remove deprecated `version` element
+* Update scraping rules for `ilpost.it`
+* Bump `github.com/PuerkitoBio/goquery` from `1.8.0` to `1.8.1`
+* Bump `github.com/tdewolff/minify/v2` from `2.12.4` to `2.12.5`
+* Bump `github.com/yuin/goldmark` from `1.5.3` to `1.5.4`
+* Bump `golang.org/x/*` dependencies
+
+Version 2.0.42 (January 29, 2023)
+---------------------------------
+
+* Fix header items wrapping
+* Add option to enable or disable double tap
+* Improve PWA display mode label in settings page
+* Bump `golang.org/x/*` dependencies
+* Update translations
+* Add scraping rule for `ilpost.it`
+* Update reading time HTML element after fetching the original web page
+* Add category feeds refresh feature
+
 Version 2.0.41 (December 10, 2022)
 ----------------------------------
 

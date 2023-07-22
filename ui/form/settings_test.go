@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 package form // import "miniflux.app/ui/form"
 
 import (
@@ -15,6 +18,7 @@ func TestValid(t *testing.T) {
 		EntryDirection:      "asc",
 		EntriesPerPage:      50,
 		DisplayMode:         "standalone",
+		GestureNav:          "tap",
 		DefaultReadingSpeed: 35,
 		CJKReadingSpeed:     25,
 		DefaultHomePage:     "unread",
@@ -37,6 +41,7 @@ func TestConfirmationEmpty(t *testing.T) {
 		EntryDirection:      "asc",
 		EntriesPerPage:      50,
 		DisplayMode:         "standalone",
+		GestureNav:          "tap",
 		DefaultReadingSpeed: 35,
 		CJKReadingSpeed:     25,
 		DefaultHomePage:     "unread",
@@ -63,6 +68,7 @@ func TestConfirmationIncorrect(t *testing.T) {
 		EntryDirection:      "asc",
 		EntriesPerPage:      50,
 		DisplayMode:         "standalone",
+		GestureNav:          "tap",
 		DefaultReadingSpeed: 35,
 		CJKReadingSpeed:     25,
 		DefaultHomePage:     "unread",

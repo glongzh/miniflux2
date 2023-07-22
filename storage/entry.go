@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package storage // import "miniflux.app/storage"
 
@@ -119,7 +118,8 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 				feed_id,
 				reading_time,
 				changed_at,
-				document_vectors
+				document_vectors,
+				tags
 			)
 		VALUES
 			(
@@ -134,7 +134,8 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 				$9,
 				$10,
 				now(),
-				setweight(to_tsvector(left(coalesce($1, ''), 500000)), 'A') || setweight(to_tsvector(left(coalesce($6, ''), 500000)), 'B')
+				setweight(to_tsvector(left(coalesce($1, ''), 500000)), 'A') || setweight(to_tsvector(left(coalesce($6, ''), 500000)), 'B'),
+				$11
 			)
 		RETURNING
 			id, status
@@ -151,6 +152,7 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 		entry.UserID,
 		entry.FeedID,
 		entry.ReadingTime,
+		pq.Array(removeDuplicates(entry.Tags)),
 	).Scan(&entry.ID, &entry.Status)
 
 	if err != nil {
@@ -183,7 +185,8 @@ func (s *Storage) updateEntry(tx *sql.Tx, entry *model.Entry) error {
 			content=$4,
 			author=$5,
 			reading_time=$6,
-			document_vectors = setweight(to_tsvector(left(coalesce($1, ''), 500000)), 'A') || setweight(to_tsvector(left(coalesce($4, ''), 500000)), 'B')
+			document_vectors = setweight(to_tsvector(left(coalesce($1, ''), 500000)), 'A') || setweight(to_tsvector(left(coalesce($4, ''), 500000)), 'B'),
+			tags=$10
 		WHERE
 			user_id=$7 AND feed_id=$8 AND hash=$9
 		RETURNING
@@ -200,6 +203,7 @@ func (s *Storage) updateEntry(tx *sql.Tx, entry *model.Entry) error {
 		entry.UserID,
 		entry.FeedID,
 		entry.Hash,
+		pq.Array(removeDuplicates(entry.Tags)),
 	).Scan(&entry.ID)
 
 	if err != nil {
@@ -215,15 +219,17 @@ func (s *Storage) updateEntry(tx *sql.Tx, entry *model.Entry) error {
 }
 
 // entryExists checks if an entry already exists based on its hash when refreshing a feed.
-func (s *Storage) entryExists(tx *sql.Tx, entry *model.Entry) bool {
+func (s *Storage) entryExists(tx *sql.Tx, entry *model.Entry) (bool, error) {
 	var result bool
-	tx.QueryRow(
-		`SELECT true FROM entries WHERE user_id=$1 AND feed_id=$2 AND hash=$3`,
-		entry.UserID,
-		entry.FeedID,
-		entry.Hash,
-	).Scan(&result)
-	return result
+
+	// Note: This query uses entries_feed_id_hash_key index (filtering on user_id is not necessary).
+	err := tx.QueryRow(`SELECT true FROM entries WHERE feed_id=$1 AND hash=$2`, entry.FeedID, entry.Hash).Scan(&result)
+
+	if err != nil && err != sql.ErrNoRows {
+		return result, fmt.Errorf(`store: unable to check if entry exists: %v`, err)
+	}
+
+	return result, nil
 }
 
 // GetReadTime fetches the read time of an entry based on its hash, and the feed id and user id from the feed.
@@ -270,7 +276,15 @@ func (s *Storage) RefreshFeedEntries(userID, feedID int64, entries model.Entries
 			return fmt.Errorf(`store: unable to start transaction: %v`, err)
 		}
 
-		if s.entryExists(tx, entry) {
+		entryExists, err := s.entryExists(tx, entry)
+		if err != nil {
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				return fmt.Errorf(`store: unable to rollback transaction: %v (rolled back due to: %v)`, rollbackErr, err)
+			}
+			return err
+		}
+
+		if entryExists {
 			if updateExistingEntries {
 				err = s.updateEntry(tx, entry)
 			}
@@ -279,7 +293,9 @@ func (s *Storage) RefreshFeedEntries(userID, feedID int64, entries model.Entries
 		}
 
 		if err != nil {
-			tx.Rollback()
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				return fmt.Errorf(`store: unable to rollback transaction: %v (rolled back due to: %v)`, rollbackErr, err)
+			}
 			return err
 		}
 
@@ -444,6 +460,33 @@ func (s *Storage) MarkAllAsRead(userID int64) error {
 	return nil
 }
 
+// MarkGloballyVisibleFeedsAsRead updates all user entries to the read status.
+func (s *Storage) MarkGloballyVisibleFeedsAsRead(userID int64) error {
+	query := `
+		UPDATE
+			entries
+		SET
+			status=$1,
+			changed_at=now()
+		FROM
+			feeds
+		WHERE
+			entries.feed_id = feeds.id
+			AND entries.user_id=$2
+			AND entries.status=$3
+			AND feeds.hide_globally=$4
+	`
+	result, err := s.db.Exec(query, model.EntryStatusRead, userID, model.EntryStatusUnread, false)
+	if err != nil {
+		return fmt.Errorf(`store: unable to mark globally visible feeds as read: %v`, err)
+	}
+
+	count, _ := result.RowsAffected()
+	logger.Debug("[Storage:MarkGloballyVisibleFeedsAsRead] %d items marked as read", count)
+
+	return nil
+}
+
 // MarkFeedAsRead updates all feed entries to the read status.
 func (s *Storage) MarkFeedAsRead(userID, feedID int64, before time.Time) error {
 	query := `
@@ -534,4 +577,17 @@ func (s *Storage) UnshareEntry(userID int64, entryID int64) (err error) {
 		err = fmt.Errorf(`store: unable to remove share code for entry #%d: %v`, entryID, err)
 	}
 	return
+}
+
+// removeDuplicate removes duplicate entries from a slice
+func removeDuplicates[T string | int](sliceList []T) []T {
+	allKeys := make(map[T]bool)
+	list := []T{}
+	for _, item := range sliceList {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
 }

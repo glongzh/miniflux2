@@ -1,6 +1,5 @@
-// Copyright 2019 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package atom // import "miniflux.app/reader/atom"
 
@@ -28,6 +27,7 @@ type atom10Feed struct {
 	ID      string        `xml:"id"`
 	Title   atom10Text    `xml:"title"`
 	Authors atomAuthors   `xml:"author"`
+	Icon    string        `xml:"icon"`
 	Links   atomLinks     `xml:"link"`
 	Entries []atom10Entry `xml:"entry"`
 }
@@ -53,6 +53,8 @@ func (a *atom10Feed) Transform(baseURL string) *model.Feed {
 	if feed.Title == "" {
 		feed.Title = feed.SiteURL
 	}
+
+	feed.IconURL = strings.TrimSpace(a.Icon)
 
 	for _, entry := range a.Entries {
 		item := entry.Transform()
@@ -80,14 +82,15 @@ func (a *atom10Feed) Transform(baseURL string) *model.Feed {
 }
 
 type atom10Entry struct {
-	ID        string      `xml:"id"`
-	Title     atom10Text  `xml:"title"`
-	Published string      `xml:"published"`
-	Updated   string      `xml:"updated"`
-	Links     atomLinks   `xml:"link"`
-	Summary   atom10Text  `xml:"summary"`
-	Content   atom10Text  `xml:"http://www.w3.org/2005/Atom content"`
-	Authors   atomAuthors `xml:"author"`
+	ID         string           `xml:"id"`
+	Title      atom10Text       `xml:"title"`
+	Published  string           `xml:"published"`
+	Updated    string           `xml:"updated"`
+	Links      atomLinks        `xml:"link"`
+	Summary    atom10Text       `xml:"summary"`
+	Content    atom10Text       `xml:"http://www.w3.org/2005/Atom content"`
+	Authors    atomAuthors      `xml:"author"`
+	Categories []atom10Category `xml:"category"`
 	media.Element
 }
 
@@ -101,6 +104,7 @@ func (a *atom10Entry) Transform() *model.Entry {
 	entry.Title = a.entryTitle()
 	entry.Enclosures = a.entryEnclosures()
 	entry.CommentsURL = a.entryCommentsURL()
+	entry.Tags = a.entryCategories()
 	return entry
 }
 
@@ -214,6 +218,20 @@ func (a *atom10Entry) entryEnclosures() model.EnclosureList {
 	return enclosures
 }
 
+func (r *atom10Entry) entryCategories() []string {
+	var categoryList []string
+
+	for _, atomCategory := range r.Categories {
+		if strings.TrimSpace(atomCategory.Label) != "" {
+			categoryList = append(categoryList, strings.TrimSpace(atomCategory.Label))
+		} else {
+			categoryList = append(categoryList, strings.TrimSpace(atomCategory.Term))
+		}
+	}
+
+	return categoryList
+}
+
 // See https://tools.ietf.org/html/rfc4685#section-4
 // If the type attribute of the atom:link is omitted, its value is assumed to be "application/atom+xml".
 // We accept only HTML or XHTML documents for now since the intention is to have the same behavior as RSS.
@@ -230,6 +248,11 @@ type atom10Text struct {
 	CharData         string               `xml:",chardata"`
 	InnerXML         string               `xml:",innerxml"`
 	XHTMLRootElement atomXHTMLRootElement `xml:"http://www.w3.org/1999/xhtml div"`
+}
+
+type atom10Category struct {
+	Term  string `xml:"term,attr"`
+	Label string `xml:"label,attr"`
 }
 
 // Text: https://datatracker.ietf.org/doc/html/rfc4287#section-3.1.1.1

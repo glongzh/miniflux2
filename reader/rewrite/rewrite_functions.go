@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package rewrite // import "miniflux.app/reader/rewrite"
 
@@ -209,7 +208,7 @@ func addYoutubeVideo(entryURL, entryContent string) string {
 	matches := youtubeRegex.FindStringSubmatch(entryURL)
 
 	if len(matches) == 2 {
-		video := `<iframe width="650" height="350" frameborder="0" src="https://www.youtube-nocookie.com/embed/` + matches[1] + `" allowfullscreen></iframe>`
+		video := `<iframe width="650" height="350" frameborder="0" src="` + config.Opts.YouTubeEmbedUrlOverride() + matches[1] + `" allowfullscreen></iframe>`
 		return video + `<br>` + entryContent
 	}
 	return entryContent
@@ -233,7 +232,8 @@ func addYoutubeVideoFromId(entryContent string) string {
 	sb := strings.Builder{}
 	for _, match := range matches {
 		if len(match) == 2 {
-			sb.WriteString(`<iframe width="650" height="350" frameborder="0" src="https://www.youtube-nocookie.com/embed/`)
+			sb.WriteString(`<iframe width="650" height="350" frameborder="0" src="`)
+			sb.WriteString(config.Opts.YouTubeEmbedUrlOverride())
 			sb.WriteString(match[1])
 			sb.WriteString(`" allowfullscreen></iframe><br>`)
 		}
@@ -334,4 +334,50 @@ func parseMarkdown(entryContent string) string {
 	}
 
 	return sb.String()
+}
+
+func removeTables(entryContent string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
+	if err != nil {
+		return entryContent
+	}
+
+	selectors := []string{"table", "tbody", "thead", "td", "th", "td"}
+
+	var loopElement *goquery.Selection
+
+	for _, selector := range selectors {
+		for {
+			loopElement = doc.Find(selector).First()
+
+			if loopElement.Length() == 0 {
+				break
+			}
+
+			innerHtml, err := loopElement.Html()
+			if err != nil {
+				break
+			}
+
+			loopElement.Parent().AppendHtml(innerHtml)
+			loopElement.Remove()
+		}
+	}
+
+	output, _ := doc.Find("body").First().Html()
+	return output
+}
+
+func removeClickbait(entryTitle string) string {
+	titleWords := []string{}
+	for _, word := range strings.Fields(entryTitle) {
+		runes := []rune(word)
+		if len(runes) > 1 {
+			// keep first rune as is to keep the first capital letter
+			titleWords = append(titleWords, string([]rune{runes[0]})+strings.ToLower(string(runes[1:])))
+		} else {
+			titleWords = append(titleWords, word)
+		}
+	}
+	return strings.Join(titleWords, " ")
 }

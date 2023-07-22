@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package form // import "miniflux.app/ui/form"
 
@@ -32,6 +31,9 @@ type IntegrationForm struct {
 	WallabagClientSecret string
 	WallabagUsername     string
 	WallabagPassword     string
+	NotionEnabled        bool
+	NotionPageID         string
+	NotionToken          string
 	NunuxKeeperEnabled   bool
 	NunuxKeeperURL       string
 	NunuxKeeperAPIKey    string
@@ -48,6 +50,8 @@ type IntegrationForm struct {
 	LinkdingEnabled      bool
 	LinkdingURL          string
 	LinkdingAPIKey       string
+	LinkdingTags         string
+	LinkdingMarkAsUnread bool
 	MatrixBotEnabled     bool
 	MatrixBotUser        string
 	MatrixBotPassword    string
@@ -75,6 +79,9 @@ func (i IntegrationForm) Merge(integration *model.Integration) {
 	integration.WallabagClientSecret = i.WallabagClientSecret
 	integration.WallabagUsername = i.WallabagUsername
 	integration.WallabagPassword = i.WallabagPassword
+	integration.NotionEnabled = i.NotionEnabled
+	integration.NotionPageID = i.NotionPageID
+	integration.NotionToken = i.NotionToken
 	integration.NunuxKeeperEnabled = i.NunuxKeeperEnabled
 	integration.NunuxKeeperURL = i.NunuxKeeperURL
 	integration.NunuxKeeperAPIKey = i.NunuxKeeperAPIKey
@@ -91,6 +98,8 @@ func (i IntegrationForm) Merge(integration *model.Integration) {
 	integration.LinkdingEnabled = i.LinkdingEnabled
 	integration.LinkdingURL = i.LinkdingURL
 	integration.LinkdingAPIKey = i.LinkdingAPIKey
+	integration.LinkdingTags = i.LinkdingTags
+	integration.LinkdingMarkAsUnread = i.LinkdingMarkAsUnread
 	integration.MatrixBotEnabled = i.MatrixBotEnabled
 	integration.MatrixBotUser = i.MatrixBotUser
 	integration.MatrixBotPassword = i.MatrixBotPassword
@@ -121,6 +130,9 @@ func NewIntegrationForm(r *http.Request) *IntegrationForm {
 		WallabagClientSecret: r.FormValue("wallabag_client_secret"),
 		WallabagUsername:     r.FormValue("wallabag_username"),
 		WallabagPassword:     r.FormValue("wallabag_password"),
+		NotionEnabled:        r.FormValue("notion_enabled") == "1",
+		NotionPageID:         r.FormValue("notion_page_id"),
+		NotionToken:          r.FormValue("notion_token"),
 		NunuxKeeperEnabled:   r.FormValue("nunux_keeper_enabled") == "1",
 		NunuxKeeperURL:       r.FormValue("nunux_keeper_url"),
 		NunuxKeeperAPIKey:    r.FormValue("nunux_keeper_api_key"),
@@ -137,6 +149,8 @@ func NewIntegrationForm(r *http.Request) *IntegrationForm {
 		LinkdingEnabled:      r.FormValue("linkding_enabled") == "1",
 		LinkdingURL:          r.FormValue("linkding_url"),
 		LinkdingAPIKey:       r.FormValue("linkding_api_key"),
+		LinkdingTags:         r.FormValue("linkding_tags"),
+		LinkdingMarkAsUnread: r.FormValue("linkding_mark_as_unread") == "1",
 		MatrixBotEnabled:     r.FormValue("matrix_bot_enabled") == "1",
 		MatrixBotUser:        r.FormValue("matrix_bot_user"),
 		MatrixBotPassword:    r.FormValue("matrix_bot_password"),

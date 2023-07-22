@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package locale // import "miniflux.app/locale"
 
@@ -52,6 +51,10 @@ var pluralForms = map[string]pluralFormFunc{
 		}
 
 		return 2
+	},
+	// nplurals=1; plural=0;
+	"id_ID": func(n int) int {
+		return 0
 	},
 	// nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 	"pl_PL": func(n int) int {
