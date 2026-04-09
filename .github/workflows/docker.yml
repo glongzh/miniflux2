@@ -1,19 +1,19 @@
 name: Docker
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: "0 1 * * *"
   push:
     tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+      - "[0-9]+.[0-9]+.[0-9]+"
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'packaging/docker/**'
-      - '.github/workflows/docker.yml'
+      - "packaging/docker/**"
+      - ".github/workflows/docker.yml"
 jobs:
   docker-images:
     name: Docker Images
-    if: github.repository_owner == 'miniflux'
+    if: github.repository_owner == 'glongzh'
     permissions:
       packages: write
     runs-on: ubuntu-latest
