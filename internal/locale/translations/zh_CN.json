@@ -62,6 +62,8 @@
     "entry.scraper.completed": "完成！",
     "entry.scraper.label": "下载",
     "entry.scraper.title": "获取原始内容",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "通过 Defuddle 获取原文",
     "entry.share.label": "分享",
     "entry.share.title": "分享此条目",
     "entry.shared_entry.label": "分享",

@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "रद्द करें",
     "action.download": "डाउनलोड",
     "action.edit": "संपाद करे",
@@ -64,6 +64,8 @@
     "entry.scraper.completed": "कार्य समाप्त हुआ!",
     "entry.scraper.label": "डाउनलोड",
     "entry.scraper.title": "मूल विषयवस्तु लाए",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "साझा करें",
     "entry.share.title": "विषयवस्तु साझा करें",
     "entry.shared_entry.label": "साझा करें",

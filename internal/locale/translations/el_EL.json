@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "ακύρωση",
     "action.download": "Λήψη",
     "action.edit": "Επεξεργασία",
@@ -64,6 +64,8 @@
     "entry.scraper.completed": "Έγινε!",
     "entry.scraper.label": "Λήψη",
     "entry.scraper.title": "Λήψη αρχικού περιεχομένου",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Διαμοιρασμός",
     "entry.share.title": "Μοιραστείτε αυτό το άρθρο",
     "entry.shared_entry.label": "Διαμοιρασμός",

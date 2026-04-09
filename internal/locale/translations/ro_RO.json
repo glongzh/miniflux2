@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "abandon",
     "action.download": "Descărcare",
     "action.edit": "Editare",
@@ -66,6 +66,8 @@
     "entry.scraper.completed": "Gata!",
     "entry.scraper.label": "Descărcare",
     "entry.scraper.title": "Descarcă conținutul original",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Partajare",
     "entry.share.title": "Partajează această înregistrare",
     "entry.shared_entry.label": "Partajare",

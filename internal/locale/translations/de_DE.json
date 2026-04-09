@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "abbrechen",
     "action.download": "Herunterladen",
     "action.edit": "Bearbeiten",
@@ -64,6 +64,8 @@
     "entry.scraper.completed": "Erledigt!",
     "entry.scraper.label": "Herunterladen",
     "entry.scraper.title": "Inhalt herunterladen",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Teilen",
     "entry.share.title": "Diesen Artikel teilen",
     "entry.shared_entry.label": "Teilen",

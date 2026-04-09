@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "скасувати",
     "action.download": "Завантажити",
     "action.edit": "Редагувати",
@@ -66,6 +66,8 @@
     "entry.scraper.completed": "Готово!",
     "entry.scraper.label": "Завантажити",
     "entry.scraper.title": "Отримати оригінальний зміст",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Поділитись",
     "entry.share.title": "Поділитись статтєю",
     "entry.shared_entry.label": "Поділитись",

@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "إلغاء",
     "action.download": "تحميل",
     "action.edit": "تعديل",
@@ -72,6 +72,8 @@
     "entry.scraper.completed": "تم!",
     "entry.scraper.label": "تحميل",
     "entry.scraper.title": "جلب المحتوى الأصلي",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "مشاركة",
     "entry.share.title": "مشاركة هذا المقال",
     "entry.shared_entry.label": "مشاركة",

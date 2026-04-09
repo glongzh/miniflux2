@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "取消",
     "action.download": "下載",
     "action.edit": "編輯",
@@ -62,6 +62,8 @@
     "entry.scraper.completed": "下載完成",
     "entry.scraper.label": "下載原文",
     "entry.scraper.title": "下載原文內容",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "分享",
     "entry.share.title": "分享這篇文章",
     "entry.shared_entry.label": "分享",

@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "取り消し",
     "action.download": "ダウンロード",
     "action.edit": "編集",
@@ -62,6 +62,8 @@
     "entry.scraper.completed": "完了!",
     "entry.scraper.label": "ダウンロード",
     "entry.scraper.title": "オリジナルの内容を取得",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "共有",
     "entry.share.title": "この記事を共有する",
     "entry.shared_entry.label": "共有する",

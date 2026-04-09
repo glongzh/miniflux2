@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "Chhú-siau",
     "action.download": "Lia̍h----loh-lâi",
     "action.edit": "Pian-chi̍p",
@@ -62,6 +62,8 @@
     "entry.scraper.completed": "Lia̍h soah--ah",
     "entry.scraper.label": "Lia̍h--lo̍h-lâi",
     "entry.scraper.title": "Lia̍h goân-tóe lōe-iông",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Hun-hióng",
     "entry.share.title": "Hun-hióng chit ê siau-sit",
     "entry.shared_entry.label": "Hun-hióng",

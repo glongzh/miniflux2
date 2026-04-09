@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "peru",
     "action.download": "Lataa",
     "action.edit": "Muokkaa",
@@ -64,6 +64,8 @@
     "entry.scraper.completed": "Valmis!",
     "entry.scraper.label": "Lataa",
     "entry.scraper.title": "Nouda alkuperäinen sisältö",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Jaa",
     "entry.share.title": "Jaa tämä artikkeli",
     "entry.shared_entry.label": "Jaa",

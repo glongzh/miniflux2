@@ -64,6 +64,8 @@
     "entry.scraper.completed": "Done!",
     "entry.scraper.label": "Download",
     "entry.scraper.title": "Fetch original content",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Share",
     "entry.share.title": "Share this entry",
     "entry.shared_entry.label": "Share",

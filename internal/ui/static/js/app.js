@@ -764,6 +764,35 @@ function handleFetchOriginalContentAction() {
 }
 
 /**
+ * Handle fetching the content of an entry via Defuddle.
+ *
+ * @returns {void}
+ */
+function handleFetchDefuddleContentAction() {
+    if (isListView()) return;
+
+    const buttonElement = document.querySelector(":is(a, button)[data-fetch-content-defuddle]");
+    if (!buttonElement) return;
+
+    const originalButtonElement = setButtonToLoadingState(buttonElement);
+
+    sendPOSTRequest(buttonElement.dataset.fetchDefuddleUrl).then((response) => {
+        restoreButtonState(buttonElement, originalButtonElement);
+
+        response.json().then((data) => {
+            if (data.content && data.reading_time) {
+                const ttpolicy = trustedTypes.createPolicy('html', {createHTML: html => html});
+                document.querySelector(".entry-content").innerHTML = ttpolicy.createHTML(data.content);
+                const entryReadingtimeElement = document.querySelector(".entry-reading-time");
+                if (entryReadingtimeElement) {
+                    entryReadingtimeElement.textContent = data.reading_time;
+                }
+            }
+        });
+    });
+}
+
+/**
  * Open the original link of an entry.
  *
  * @param {boolean} openLinkInCurrentTab - Whether to open the link in the current tab.
@@ -1197,6 +1226,7 @@ function initializeKeyboardShortcuts() {
     keyboardHandler.on("A", markPageAsReadAction);
     keyboardHandler.on("s", () => handleSaveEntryAction());
     keyboardHandler.on("d", handleFetchOriginalContentAction);
+    keyboardHandler.on("D", handleFetchDefuddleContentAction);
     keyboardHandler.on("f", () => handleStarAction());
 
     // Feed actions
@@ -1236,6 +1266,7 @@ function initializeClickHandlers() {
     onClick(":is(a, button)[data-toggle-starred]", (event) => handleStarAction(event.target));
     onClick(":is(a, button)[data-toggle-status]", (event) => handleEntryStatus("next", event.target));
     onClick(":is(a, button)[data-fetch-content-entry]", handleFetchOriginalContentAction);
+    onClick(":is(a, button)[data-fetch-content-defuddle]", handleFetchDefuddleContentAction);
     onClick(":is(a, button)[data-share-status]", handleEntryShareAction);
 
     // Page actions with confirmation

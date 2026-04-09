@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "iptal",
     "action.download": "İndir",
     "action.edit": "Düzenle",
@@ -64,6 +64,8 @@
     "entry.scraper.completed": "Tamamlandı!",
     "entry.scraper.label": "İndir",
     "entry.scraper.title": "Orijinal içeriği çek",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Paylaş",
     "entry.share.title": "Bu makeleyi paylaş",
     "entry.shared_entry.label": "Paylaş",

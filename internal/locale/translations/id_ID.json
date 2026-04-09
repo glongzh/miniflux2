@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "batal",
     "action.download": "Unduh",
     "action.edit": "Sunting",
@@ -62,6 +62,8 @@
     "entry.scraper.completed": "Selesai!",
     "entry.scraper.label": "Unduh",
     "entry.scraper.title": "Ambil konten asli",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Bagikan",
     "entry.share.title": "Bagikan artikel ini",
     "entry.shared_entry.label": "Bagikan",

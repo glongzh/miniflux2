@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "annuleren",
     "action.download": "Downloaden",
     "action.edit": "Bewerken",
@@ -64,6 +64,8 @@
     "entry.scraper.completed": "Klaar!",
     "entry.scraper.label": "Downloaden",
     "entry.scraper.title": "Originele inhoud ophalen",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Delen",
     "entry.share.title": "Deel dit artikel",
     "entry.shared_entry.label": "Delen",

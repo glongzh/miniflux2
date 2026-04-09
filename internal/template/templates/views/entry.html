@@ -125,6 +125,15 @@
                         data-label-loading="{{ t "entry.state.loading" }}"
                         >{{ icon "scraper" }}<span class="icon-label">{{ t "entry.scraper.label" }}</span></button>
                 </li>
+                <li>
+                    <button
+                        class="page-button"
+                        title="{{ t "entry.defuddle.title" }}"
+                        data-fetch-content-defuddle="true"
+                        data-fetch-defuddle-url="{{ routePath "/entry/defuddle/%d" .entry.ID }}"
+                        data-label-loading="{{ t "entry.state.loading" }}"
+                        >{{ icon "scraper" }}<span class="icon-label">{{ t "entry.defuddle.label" }}</span></button>
+                </li>
                 {{ if .entry.CommentsURL }}
                 <li>
                     <a href="{{ .entry.CommentsURL | safeURL }}"

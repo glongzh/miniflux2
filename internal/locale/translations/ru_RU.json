@@ -1,4 +1,4 @@
-{
+﻿{
     "action.cancel": "закрыть",
     "action.download": "Загрузить",
     "action.edit": "Изменить",
@@ -66,6 +66,8 @@
     "entry.scraper.completed": "Готово!",
     "entry.scraper.label": "Скачать",
     "entry.scraper.title": "Извлечь оригинальное содержимое",
+    "entry.defuddle.label": "Defuddle",
+    "entry.defuddle.title": "Fetch content via Defuddle",
     "entry.share.label": "Поделиться",
     "entry.share.title": "Поделиться этой статьёй",
     "entry.shared_entry.label": "Поделиться",
