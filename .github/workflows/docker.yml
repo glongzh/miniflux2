@@ -30,7 +30,6 @@ jobs:
           images: |
             docker.io/${{ github.repository_owner }}/miniflux
             ghcr.io/${{ github.repository_owner }}/miniflux
-            quay.io/${{ github.repository_owner }}/miniflux
           tags: |
             type=ref,event=pr
             type=schedule,pattern=nightly
@@ -43,7 +42,6 @@ jobs:
           images: |
             docker.io/${{ github.repository_owner }}/miniflux
             ghcr.io/${{ github.repository_owner }}/miniflux
-            quay.io/${{ github.repository_owner }}/miniflux
           tags: |
             type=ref,event=pr
             type=schedule,pattern=nightly
@@ -71,14 +69,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Login to Quay Container Registry
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v4
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build and Push Alpine images
         uses: docker/build-push-action@v7
