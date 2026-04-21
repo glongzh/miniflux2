@@ -87,6 +87,9 @@ func (h *handler) fetchContentViaDefuddle(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Remove YAML frontmatter from markdown content.
+	markdownBytes = removeFrontmatter(markdownBytes)
+
 	// Convert Markdown to HTML using goldmark.
 	var htmlBuf bytes.Buffer
 	md := goldmark.New()
@@ -116,4 +119,26 @@ func (h *handler) fetchContentViaDefuddle(w http.ResponseWriter, r *http.Request
 	readingTime := locale.NewPrinter(user.Language).Plural("entry.estimated_reading_time", entry.ReadingTime, entry.ReadingTime)
 
 	response.JSON(w, r, map[string]string{"content": mediaproxy.RewriteDocumentWithRelativeProxyURL(entry.Content), "reading_time": readingTime})
+}
+
+// removeFrontmatter removes YAML frontmatter from markdown content.
+// Frontmatter is a block of metadata at the beginning of the file
+// enclosed by triple dashes (---).
+func removeFrontmatter(content []byte) []byte {
+	content = bytes.TrimSpace(content)
+
+	// Check if content starts with ---
+	if !bytes.HasPrefix(content, []byte("---")) {
+		return content
+	}
+
+	// Find the closing ---
+	endIdx := bytes.Index(content[3:], []byte("---"))
+	if endIdx == -1 {
+		return content
+	}
+
+	// Return content after the closing ---
+	result := content[3+endIdx+3:]
+	return bytes.TrimSpace(result)
 }
